@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{payment/layout/base :: layout(~{::title}, ~{::div.transaction-process-content})}">
+<head>
+    <title>Process Transaction</title>
+</head>
+<body>
+<div class="transaction-process-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-cog me-2"></i>Process Transaction</h1>
+        <a href="/payment/transactions" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Transactions
+        </a>
+    </div>
+
+    <div th:if="${ticket == null}" class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4>Select a Transaction to Process</h4>
+            <p class="text-muted">Please select a transaction from the transactions list to start processing.</p>
+            <a href="/payment/transactions" class="btn btn-primary">
+                <i class="fas fa-list me-2"></i>View Transactions
+            </a>
+        </div>
+    </div>
+
+    <div th:if="${ticket != null}" class="row">
+        <div class="col-md-8">
+            <!-- Transaction Details -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Transaction #<span th:text="${ticket.id}"></span></h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Student:</strong>
+                            <div th:text="${ticket.studentName}"></div>
+                            <small class="text-muted" th:text="${ticket.studentId}"></small>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Amount:</strong>
+                            <div class="fw-bold">Rs. <span th:text="${ticket.amount != null ? #numbers.formatDecimal(ticket.amount, 1, 2) : '0.00'}"></span></div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <strong>Description:</strong>
+                            <div class="bg-light p-3 rounded mt-1" th:text="${ticket.description}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Processing Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Processing Actions</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Verification Section -->
+                    <div class="mb-4">
+                        <h6>Verification</h6>
+                        <form th:action="@{/payment/transactions/{id}/verify(id=${ticket.id})}" method="post" class="d-flex gap-2 align-items-center">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="verified" id="verifyTrue" value="true" th:checked="${ticket.verified != null && ticket.verified}">
+                                <label class="form-check-label" for="verifyTrue">
+                                    Mark as Verified
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="verified" id="verifyFalse" value="false" th:checked="${ticket.verified == null || !ticket.verified}">
+                                <label class="form-check-label" for="verifyFalse">
+                                    Mark as Unverifiable
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fas fa-check me-2"></i>Update Verification
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Status Update -->
+                    <div class="mb-4">
+                        <h6>Status Update</h6>
+                        <form th:action="@{/payment/transactions/{id}/status(id=${ticket.id})}" method="post" class="d-flex gap-2 align-items-center">
+                            <select name="status" class="form-select" style="width: auto;">
+                                <option value="OPEN" th:selected="${ticket.status.name() == 'OPEN'}">Pending</option>
+                                <option value="IN_PROGRESS" th:selected="${ticket.status.name() == 'IN_PROGRESS'}">Processing</option>
+                                <option value="RESOLVED" th:selected="${ticket.status.name() == 'RESOLVED'}">Resolved</option>
+                                <option value="CLOSED" th:selected="${ticket.status.name() == 'CLOSED'}">Closed</option>
+                            </select>
+                            <button type="submit" class="btn btn-warning btn-sm">
+                                <i class="fas fa-sync me-2"></i>Update Status
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Category Assignment -->
+                    <div class="mb-4">
+                        <h6>Category Assignment</h6>
+                        <form th:action="@{/payment/transactions/{id}/category(id=${ticket.id})}" method="post" class="row g-2 align-items-end">
+                            <div class="col-md-5">
+                                <label for="categoryId" class="form-label">Category</label>
+                                <select name="categoryId" id="categoryId" class="form-select" required>
+                                    <option value="">Select Category</option>
+                                    <option th:each="category : ${categories}"
+                                            th:value="${category.id}"
+                                            th:text="${category.name}"
+                                            th:selected="${ticket.category != null and ticket.category.id == category.id}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <label for="subcategory" class="form-label">Subcategory</label>
+                                <input type="text" class="form-control" id="subcategory" name="subcategory"
+                                       th:value="${ticket.subcategory}" placeholder="Enter subcategory">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-info btn-sm w-100">
+                                    <i class="fas fa-tag me-2"></i>Assign
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Escalation -->
+                    <div>
+                        <h6>Escalation</h6>
+                        <p class="text-muted small">Escalate this transaction to admin for further review.</p>
+                        <form th:action="@{/payment/transactions/{id}/escalate(id=${ticket.id})}" method="post"
+                              onsubmit="return confirm('Are you sure you want to escalate this transaction?')">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Escalate to Admin
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Current Status -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Current Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Status:</strong>
+                        <span class="badge float-end"
+                              th:classappend="${ticket.status.name() == 'OPEN'} ? 'bg-warning' : 
+                                             (${ticket.status.name() == 'IN_PROGRESS'} ? 'bg-info' : 
+                                             (${ticket.status.name() == 'RESOLVED'} ? 'bg-success' : 'bg-secondary'))"
+                              th:text="${ticket.status.name() == 'OPEN' ? 'Pending' : 
+                                       (ticket.status.name() == 'IN_PROGRESS' ? 'Processing' : 
+                                       (ticket.status.name() == 'RESOLVED' ? 'Resolved' : 'Closed'))}"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Verified:</strong>
+                        <span th:if="${ticket.verified != null && ticket.verified}" class="badge bg-success float-end">Verified</span>
+                        <span th:unless="${ticket.verified != null && ticket.verified}" class="badge bg-secondary float-end">Not Verified</span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Category:</strong>
+                        <span th:if="${ticket.category != null}" th:text="${ticket.category.name}" class="float-end"></span>
+                        <span th:unless="${ticket.category != null}" class="text-muted float-end">-</span>
+                    </div>
+                    <div class="mb-3" th:if="${ticket.subcategory != null}">
+                        <strong>Subcategory:</strong>
+                        <span th:text="${ticket.subcategory}" class="float-end"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Timeline -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Timeline</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-primary"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">Transaction Created</h6>
+                                <small class="text-muted" th:text="${ticket.createdAt != null ? #temporals.format(ticket.createdAt, 'MMM dd, yyyy HH:mm') : '-'}"></small>
+                            </div>
+                        </div>
+
+                        <div th:if="${ticket.verified != null && ticket.verified}" class="timeline-item">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">Transaction Verified</h6>
+                                <small class="text-muted" th:text="${ticket.updatedAt != null ? #temporals.format(ticket.updatedAt, 'MMM dd, yyyy HH:mm') : '-'}"></small>
+                            </div>
+                        </div>
+
+                        <div th:if="${ticket.resolvedAt != null}" class="timeline-item">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">Transaction Resolved</h6>
+                                <small class="text-muted" th:text="${#temporals.format(ticket.resolvedAt, 'MMM dd, yyyy HH:mm')}"></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -22px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px #dee2e6;
+        }
+
+        .timeline-content h6 {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .timeline-content p {
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+        }
+    </style>
+</div>
+</body>
+</html>

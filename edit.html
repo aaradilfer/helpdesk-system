@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/business-admin-base :: layout(~{::title}, ~{::div.ticket-edit-content})}">
+<head>
+    <title th:text="'Edit Ticket #' + ${ticket.id}">Edit Ticket</title>
+</head>
+<body>
+    <div class="ticket-edit-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-edit me-2"></i>
+                Edit Ticket #<span th:text="${ticket.id}"></span>
+            </h1>
+            <div>
+                <a th:href="@{/tickets/{id}(id=${ticket.id})}" class="btn btn-outline-secondary me-2">
+                    <i class="fas fa-eye me-2"></i>View
+                </a>
+                <a href="/tickets" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Tickets
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <form th:action="@{/tickets/{id}(id=${ticket.id})}" th:object="${ticket}" method="post">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="title" th:field="*{title}" 
+                                           th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'" 
+                                           placeholder="Brief description of the issue">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" 
+                                         th:errors="*{title}"></div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="studentName" class="form-label">Student Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="studentName" th:field="*{studentName}" 
+                                           th:classappend="${#fields.hasErrors('studentName')} ? 'is-invalid'" 
+                                           placeholder="Full name">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('studentName')}" 
+                                         th:errors="*{studentName}"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="studentId" class="form-label">Student ID <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="studentId" th:field="*{studentId}" 
+                                           th:classappend="${#fields.hasErrors('studentId')} ? 'is-invalid'" 
+                                           placeholder="Student ID number">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('studentId')}" 
+                                         th:errors="*{studentId}"></div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="studentEmail" class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="studentEmail" th:field="*{studentEmail}" 
+                                           th:classappend="${#fields.hasErrors('studentEmail')} ? 'is-invalid'" 
+                                           placeholder="student@example.com">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('studentEmail')}" 
+                                         th:errors="*{studentEmail}"></div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="studentPhone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="studentPhone" th:field="*{studentPhone}" 
+                                           th:classappend="${#fields.hasErrors('studentPhone')} ? 'is-invalid'" 
+                                           placeholder="Optional phone number">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('studentPhone')}" 
+                                         th:errors="*{studentPhone}"></div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="category" th:field="*{category}" 
+                                            th:classappend="${#fields.hasErrors('category')} ? 'is-invalid'">
+                                        <option value="">Select a category</option>
+                                        <option th:each="category : ${categories}" 
+                                                th:value="${category.id}" 
+                                                th:text="${category.name}"></option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('category')}" 
+                                         th:errors="*{category}"></div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="priority" class="form-label">Priority <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="priority" th:field="*{priority}" 
+                                            th:classappend="${#fields.hasErrors('priority')} ? 'is-invalid'">
+                                        <option value="">Select priority</option>
+                                        <option th:each="priority : ${priorities}" 
+                                                th:value="${priority}" 
+                                                th:text="${priority}"></option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('priority')}" 
+                                         th:errors="*{priority}"></div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="status" class="form-label">Status</label>
+                                    <select class="form-select" id="status" th:field="*{status}">
+                                        <option th:each="status : ${statuses}" 
+                                                th:value="${status}" 
+                                                th:text="${status}"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row" th:if="${staff != null and !staff.empty}">
+                                <div class="col-md-12 mb-3">
+                                    <label for="assignedStaff" class="form-label">Assigned Staff</label>
+                                    <select class="form-select" id="assignedStaff" th:field="*{assignedStaff}">
+                                        <option value="">Unassigned</option>
+                                        <option th:each="staffMember : ${staff}" 
+                                                th:value="${staffMember.id}" 
+                                                th:text="${staffMember.name + ' (' + staffMember.department + ')'}"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="description" th:field="*{description}" rows="6" 
+                                          th:classappend="${#fields.hasErrors('description')} ? 'is-invalid'" 
+                                          placeholder="Detailed description of the issue"></textarea>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" 
+                                     th:errors="*{description}"></div>
+                            </div>
+
+                            <div class="mb-3" th:if="${ticket.status == T(com.helpdesk.entity.Ticket.Status).RESOLVED or ticket.resolutionNotes != null}">
+                                <label for="resolutionNotes" class="form-label">Resolution Notes</label>
+                                <textarea class="form-control" id="resolutionNotes" th:field="*{resolutionNotes}" rows="4" 
+                                          placeholder="Notes about how the issue was resolved"></textarea>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <a th:href="@{/tickets/{id}(id=${ticket.id})}" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Update Ticket
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Ticket Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <strong>Ticket ID:</strong>
+                            <span th:text="${ticket.id}"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Created:</strong>
+                            <span th:text="${#temporals.format(ticket.createdAt, 'MMM dd, yyyy HH:mm')}"></span>
+                        </div>
+                        <div class="mb-2" th:if="${ticket.updatedAt != null}">
+                            <strong>Last Updated:</strong>
+                            <span th:text="${#temporals.format(ticket.updatedAt, 'MMM dd, yyyy HH:mm')}"></span>
+                        </div>
+                        <div class="mb-2" th:if="${ticket.resolvedAt != null}">
+                            <strong>Resolved:</strong>
+                            <span th:text="${#temporals.format(ticket.resolvedAt, 'MMM dd, yyyy HH:mm')}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Danger Zone</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small">Permanently delete this ticket. This action cannot be undone.</p>
+                        <form th:action="@{/tickets/{id}/delete(id=${ticket.id})}" method="post" 
+                              onsubmit="return confirm('Are you sure you want to delete this ticket? This action cannot be undone.')">
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash me-2"></i>Delete Ticket
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

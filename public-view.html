@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${article.title}">Article</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/support/articles/public">Knowledge Base</a></li>
+            <li class="breadcrumb-item active" aria-current="page" th:text="${article.title}"></li>
+        </ol>
+    </nav>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0" th:text="${article.title}"></h2>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <span th:if="${article.category}" class="badge bg-info me-2">
+                    <i class="fas fa-folder me-1"></i><span th:text="${article.category.name}"></span>
+                </span>
+                <small class="text-muted">
+                    <i class="fas fa-eye me-1"></i><span th:text="${article.viewCount}"></span> views
+                </small>
+                <small class="text-muted ms-3">
+                    <i class="fas fa-calendar me-1"></i><span th:text="${#temporals.format(article.createdAt, 'MMM dd, yyyy')}"></span>
+                </small>
+            </div>
+
+            <hr>
+
+            <div class="article-content" th:utext="${article.content}"></div>
+
+            <hr>
+
+            <!-- Feedback Section -->
+            <div class="text-center">
+                <p><strong>Was this article helpful?</strong></p>
+                <form th:action="@{'/support/articles/public/' + ${article.id} + '/feedback'}" method="post" style="display:inline;">
+                    <input type="hidden" name="helpful" value="true">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-thumbs-up me-2"></i>Yes (<span th:text="${article.helpfulCount}"></span>)
+                    </button>
+                </form>
+                <form th:action="@{'/support/articles/public/' + ${article.id} + '/feedback'}" method="post" style="display:inline;">
+                    <input type="hidden" name="helpful" value="false">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-thumbs-down me-2"></i>No (<span th:text="${article.notHelpfulCount}"></span>)
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="/support/articles/public" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Knowledge Base
+        </a>
+        <a href="/" class="btn btn-outline-secondary">
+            <i class="fas fa-home me-2"></i>Home
+        </a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{payment/layout/base :: layout(~{::title}, ~{::div.settings-content})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategy Settings - Payment Portal</title>
+    <style>
+        .strategy-card {
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .strategy-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        .strategy-card.active {
+            border-color: #28a745;
+            background-color: #f0fff4;
+        }
+        .strategy-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .radio-card {
+            cursor: pointer;
+        }
+        .radio-card input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+        .radio-card input[type="radio"]:checked + .strategy-card {
+            border-color: #007bff;
+            background-color: #e7f3ff;
+        }
+        .info-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-content">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-cogs me-2"></i>Strategy Settings</h2>
+            <a href="/payment/dashboard" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <h4><i class="fas fa-info-circle me-2"></i>About Strategy Pattern</h4>
+            <p class="mb-0">
+                Configure how the Payment Portal behaves using different strategies. 
+                Choose the verification method for payments and category validation rules that best fit your needs.
+            </p>
+        </div>
+
+        <!-- Settings Form -->
+        <form action="/payment/settings/update" method="post" th:action="@{/payment/settings/update}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <!-- Payment Strategy Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-money-check-alt me-2"></i>Payment Verification Strategy
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">Choose how payments should be verified</p>
+                    
+                    <div class="row">
+                        <!-- Manual Strategy -->
+                        <div class="col-md-6 mb-3">
+                            <label class="radio-card">
+                                <input type="radio" name="paymentStrategy" value="manual" 
+                                       th:checked="${currentPaymentStrategy == 'Manual'}" required>
+                                <div class="strategy-card p-4 text-center h-100">
+                                    <div class="strategy-icon text-primary">
+                                        <i class="fas fa-user-check"></i>
+                                    </div>
+                                    <h5>Manual Verification</h5>
+                                    <p class="text-muted mb-3">Requires staff approval</p>
+                                    <ul class="text-start">
+                                        <li>Staff manually verifies each payment</li>
+                                        <li>Accepts any valid amount > Rs. 0</li>
+                                        <li>More control and oversight</li>
+                                        <li>Best for sensitive transactions</li>
+                                    </ul>
+                                    <span th:if="${currentPaymentStrategy == 'Manual'}" 
+                                          class="badge bg-success mt-2">
+                                        <i class="fas fa-check me-1"></i>Currently Active
+                                    </span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Automated Strategy -->
+                        <div class="col-md-6 mb-3">
+                            <label class="radio-card">
+                                <input type="radio" name="paymentStrategy" value="automated" 
+                                       th:checked="${currentPaymentStrategy == 'Automated'}" required>
+                                <div class="strategy-card p-4 text-center h-100">
+                                    <div class="strategy-icon text-success">
+                                        <i class="fas fa-robot"></i>
+                                    </div>
+                                    <h5>Automated Verification</h5>
+                                    <p class="text-muted mb-3">Auto-verify large payments</p>
+                                    <ul class="text-start">
+                                        <li>Automatically verifies payments</li>
+                                        <li>Accepts amount > Rs. 500</li>
+                                        <li>Faster processing</li>
+                                        <li>Best for bulk transactions</li>
+                                    </ul>
+                                    <span th:if="${currentPaymentStrategy == 'Automated'}" 
+                                          class="badge bg-success mt-2">
+                                        <i class="fas fa-check me-1"></i>Currently Active
+                                    </span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Strategy Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tags me-2"></i>Category Validation Strategy
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">Choose how category names should be validated</p>
+                    
+                    <div class="row">
+                        <!-- Strict Strategy -->
+                        <div class="col-md-6 mb-3">
+                            <label class="radio-card">
+                                <input type="radio" name="categoryStrategy" value="strict" 
+                                       th:checked="${currentCategoryStrategy == 'Strict'}" required>
+                                <div class="strategy-card p-4 text-center h-100">
+                                    <div class="strategy-icon text-danger">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </div>
+                                    <h5>Strict Validation</h5>
+                                    <p class="text-muted mb-3">No duplicate categories</p>
+                                    <ul class="text-start">
+                                        <li>Prevents duplicate category names</li>
+                                        <li>Maximum 50 characters</li>
+                                        <li>Ensures data integrity</li>
+                                        <li>Best for organized systems</li>
+                                    </ul>
+                                    <span th:if="${currentCategoryStrategy == 'Strict'}" 
+                                          class="badge bg-success mt-2">
+                                        <i class="fas fa-check me-1"></i>Currently Active
+                                    </span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Lenient Strategy -->
+                        <div class="col-md-6 mb-3">
+                            <label class="radio-card">
+                                <input type="radio" name="categoryStrategy" value="lenient" 
+                                       th:checked="${currentCategoryStrategy == 'Lenient'}" required>
+                                <div class="strategy-card p-4 text-center h-100">
+                                    <div class="strategy-icon text-info">
+                                        <i class="fas fa-hand-peace"></i>
+                                    </div>
+                                    <h5>Lenient Validation</h5>
+                                    <p class="text-muted mb-3">Allow duplicate categories</p>
+                                    <ul class="text-start">
+                                        <li>Allows duplicate category names</li>
+                                        <li>Minimal validation</li>
+                                        <li>More flexibility</li>
+                                        <li>Best for testing environments</li>
+                                    </ul>
+                                    <span th:if="${currentCategoryStrategy == 'Lenient'}" 
+                                          class="badge bg-success mt-2">
+                                        <i class="fas fa-check me-1"></i>Currently Active
+                                    </span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Note:</strong> Changes are applied immediately but are temporary. 
+                        To make changes permanent, update the <code>application.properties</code> file 
+                        and restart the application.
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="/payment/dashboard" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save me-2"></i>Apply Strategy Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Current Configuration Display -->
+        <div class="card mt-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-server me-2"></i>Current Configuration
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-money-check-alt me-2 text-primary"></i>Payment Strategy</h6>
+                        <p class="mb-0">
+                            <span class="badge bg-primary" th:text="${currentPaymentStrategy}">Manual</span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-tags me-2 text-success"></i>Category Strategy</h6>
+                        <p class="mb-0">
+                            <span class="badge bg-success" th:text="${currentCategoryStrategy}">Strict</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{payment/layout/base :: layout(~{::title}, ~{::div.transaction-create-content})}">
+<head>
+    <title>Create Payment Transaction</title>
+</head>
+<body>
+<div class="transaction-create-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            <i class="fas fa-plus-circle me-2"></i>
+            Create New Payment Transaction
+        </h1>
+        <a href="/payment/transactions" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Transactions
+        </a>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>Transaction Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/payment/transactions/create}" th:object="${transaction}" method="post" enctype="multipart/form-data">
+                        
+                        <!-- Student Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="fas fa-user-graduate me-2"></i>Student Information
+                                </h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="studentName" class="form-label">Student Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="studentName" th:field="*{studentName}"
+                                       placeholder="Full name" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('studentName')}" th:errors="*{studentName}"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="studentId" class="form-label">Student ID <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="studentId" th:field="*{studentId}"
+                                       placeholder="Student ID number" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('studentId')}" th:errors="*{studentId}"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="studentEmail" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="studentEmail" th:field="*{studentEmail}"
+                                       placeholder="student@example.com" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('studentEmail')}" th:errors="*{studentEmail}"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="studentPhone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="studentPhone" th:field="*{studentPhone}"
+                                       placeholder="+94 71 234 5678">
+                            </div>
+                        </div>
+
+                        <!-- Payment Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="fas fa-credit-card me-2"></i>Payment Information
+                                </h6>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="amount" class="form-label">Amount (Rs.) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="amount" th:field="*{amount}"
+                                       step="0.01" min="0" placeholder="0.00" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="categoryId" class="form-label">Category <span class="text-danger">*</span></label>
+                                <select class="form-select" id="categoryId" name="categoryId" required>
+                                    <option value="">Select Category</option>
+                                    <option th:each="category : ${categories}"
+                                            th:value="${category.id}"
+                                            th:text="${category.name}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="paymentMethod" class="form-label">Payment Method <span class="text-danger">*</span></label>
+                                <select class="form-select" id="paymentMethod" th:field="*{paymentMethod}" required>
+                                    <option value="">Select Method</option>
+                                    <option th:each="method : ${paymentMethods}"
+                                            th:value="${method}"
+                                            th:text="${method}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="referenceNumber" class="form-label">Reference Number</label>
+                                <input type="text" class="form-control" id="referenceNumber" th:field="*{referenceNumber}"
+                                       placeholder="Bank ref / Receipt number">
+                                <small class="form-text text-muted">Bank reference, receipt, or transaction ID</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="attachment" class="form-label">Payment Proof (Optional)</label>
+                                <input type="file" class="form-control" id="attachment" name="attachment"
+                                       accept="image/*,.pdf">
+                                <small class="form-text text-muted">Upload receipt/screenshot (Max 5MB)</small>
+                            </div>
+                        </div>
+
+                        <!-- Transaction Details -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Additional Details
+                                </h6>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" th:field="*{description}"
+                                          rows="4" placeholder="Payment purpose, additional notes..."></textarea>
+                                <small class="form-text text-muted">Optional: Provide any additional details about this transaction</small>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="/payment/transactions" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>Create Transaction
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Information -->
+            <div class="card mt-4 border-info">
+                <div class="card-body">
+                    <h6 class="text-info">
+                        <i class="fas fa-lightbulb me-2"></i>Important Information
+                    </h6>
+                    <ul class="mb-0 small">
+                        <li>All fields marked with <span class="text-danger">*</span> are required</li>
+                        <li>Transaction number will be auto-generated after creation</li>
+                        <li>New transactions start with <strong>PENDING</strong> status</li>
+                        <li>Upload payment proof for faster verification</li>
+                        <li>Accepted file formats: Images (JPG, PNG) and PDF (Max 5MB)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+

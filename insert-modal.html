@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insert Response Template</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Insert Template Modal -->
+    <div class="modal fade" id="insertTemplateModal" tabindex="-1" aria-labelledby="insertTemplateModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="insertTemplateModalLabel">
+                        <i class="fas fa-reply me-2"></i>Insert Response Template
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="templateSearch" class="form-label">Search Templates</label>
+                        <input type="text" class="form-control" id="templateSearch" placeholder="Search for templates...">
+                    </div>
+                    
+                    <div id="templateList" class="list-group">
+                        <!-- Templates will be loaded here via JavaScript -->
+                    </div>
+                    
+                    <div id="noTemplates" class="text-center py-4" style="display: none;">
+                        <i class="fas fa-search fa-2x text-muted mb-3"></i>
+                        <p class="text-muted">No templates found matching your search.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="insertSelectedTemplate" disabled>
+                        <i class="fas fa-plus me-2"></i>Insert Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedTemplate = null;
+        
+        // Load templates when modal opens
+        document.getElementById('insertTemplateModal').addEventListener('show.bs.modal', function() {
+            loadTemplates();
+        });
+        
+        // Search functionality
+        document.getElementById('templateSearch').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const templateItems = document.querySelectorAll('.template-item');
+            let visibleCount = 0;
+            
+            templateItems.forEach(item => {
+                const title = item.querySelector('.template-title').textContent.toLowerCase();
+                const content = item.querySelector('.template-content').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || content.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('noTemplates').style.display = visibleCount === 0 ? 'block' : 'none';
+        });
+        
+        // Template selection
+        function selectTemplate(templateId, title, content) {
+            // Remove previous selection
+            document.querySelectorAll('.template-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add selection to clicked item
+            event.currentTarget.classList.add('active');
+            selectedTemplate = { id: templateId, title: title, content: content };
+            
+            // Enable insert button
+            document.getElementById('insertSelectedTemplate').disabled = false;
+        }
+        
+        // Insert template
+        document.getElementById('insertSelectedTemplate').addEventListener('click', function() {
+            if (selectedTemplate) {
+                // This would typically insert the template into a text editor
+                // For now, we'll just copy to clipboard
+                navigator.clipboard.writeText(selectedTemplate.content).then(function() {
+                    alert('Template copied to clipboard!');
+                    bootstrap.Modal.getInstance(document.getElementById('insertTemplateModal')).hide();
+                });
+            }
+        });
+        
+        // Load templates from API
+        function loadTemplates() {
+            fetch('/api/responses')
+                .then(response => response.json())
+                .then(templates => {
+                    const templateList = document.getElementById('templateList');
+                    templateList.innerHTML = '';
+                    
+                    if (templates.length === 0) {
+                        document.getElementById('noTemplates').style.display = 'block';
+                        return;
+                    }
+                    
+                    templates.forEach(template => {
+                        const templateItem = document.createElement('div');
+                        templateItem.className = 'list-group-item template-item';
+                        templateItem.onclick = () => selectTemplate(template.id, template.title, template.content);
+                        
+                        templateItem.innerHTML = `
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1 template-title">${template.title}</h6>
+                                <small class="text-muted">${new Date(template.createdAt).toLocaleDateString()}</small>
+                            </div>
+                            <p class="mb-1 template-content">${template.content.substring(0, 100)}${template.content.length > 100 ? '...' : ''}</p>
+                            <small class="text-muted">Created by: ${template.createdBy}</small>
+                        `;
+                        
+                        templateList.appendChild(templateItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading templates:', error);
+                    document.getElementById('noTemplates').style.display = 'block';
+                });
+        }
+    </script>
+</body>
+</html>

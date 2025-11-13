@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{payment/layout/base :: layout(~{::title}, ~{::div.transaction-edit-content})}">
+<head>
+    <title th:text="'Edit Transaction ' + ${transaction.transactionNumber}">Edit Transaction</title>
+</head>
+<body>
+<div class="transaction-edit-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            <i class="fas fa-edit me-2"></i>
+            Edit Transaction <span th:text="${transaction.transactionNumber}" class="text-primary">TXN-2025-0001</span>
+        </h1>
+        <div>
+            <a th:href="@{/payment/transactions/{id}(id=${transaction.id})}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-eye me-2"></i>View
+            </a>
+            <a href="/payment/transactions" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Transactions
+            </a>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>Edit Transaction Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/payment/transactions/{id}/edit(id=${transaction.id})}" th:object="${transaction}" method="post" enctype="multipart/form-data">
+                        
+                        <!-- Student Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="fas fa-user-graduate me-2"></i>Student Information
+                                </h6>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="studentName" class="form-label">Student Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="studentName" th:field="*{studentName}"
+                                       placeholder="Full name" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('studentName')}" th:errors="*{studentName}"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="studentId" class="form-label">Student ID <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="studentId" th:field="*{studentId}"
+                                       placeholder="Student ID number" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('studentId')}" th:errors="*{studentId}"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="studentEmail" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="studentEmail" th:field="*{studentEmail}"
+                                       placeholder="student@example.com" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('studentEmail')}" th:errors="*{studentEmail}"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="studentPhone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="studentPhone" th:field="*{studentPhone}"
+                                       placeholder="+94 71 234 5678">
+                            </div>
+                        </div>
+
+                        <!-- Payment Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="fas fa-credit-card me-2"></i>Payment Information
+                                </h6>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="amount" class="form-label">Amount (Rs.) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="amount" th:field="*{amount}"
+                                       step="0.01" min="0" placeholder="0.00" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="categoryId" class="form-label">Category <span class="text-danger">*</span></label>
+                                <select class="form-select" id="categoryId" name="categoryId" required>
+                                    <option value="">Select Category</option>
+                                    <option th:each="category : ${categories}"
+                                            th:value="${category.id}"
+                                            th:text="${category.name}"
+                                            th:selected="${transaction.category != null && transaction.category.id == category.id}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="paymentMethod" class="form-label">Payment Method <span class="text-danger">*</span></label>
+                                <select class="form-select" id="paymentMethod" th:field="*{paymentMethod}" required>
+                                    <option value="">Select Method</option>
+                                    <option th:each="method : ${paymentMethods}"
+                                            th:value="${method}"
+                                            th:text="${method}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="referenceNumber" class="form-label">Reference Number</label>
+                                <input type="text" class="form-control" id="referenceNumber" th:field="*{referenceNumber}"
+                                       placeholder="Bank ref / Receipt number">
+                                <small class="form-text text-muted">Bank reference, receipt, or transaction ID</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                                <select class="form-select" id="status" th:field="*{status}" required>
+                                    <option th:each="stat : ${statuses}"
+                                            th:value="${stat}"
+                                            th:text="${stat}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="attachment" class="form-label">Update Payment Proof (Optional)</label>
+                                <input type="file" class="form-control" id="attachment" name="attachment"
+                                       accept="image/*,.pdf">
+                                <small class="form-text text-muted">
+                                    Current: <span th:if="${transaction.attachmentFilename != null}" th:text="${transaction.attachmentFilename}" class="badge bg-secondary"></span>
+                                    <span th:unless="${transaction.attachmentFilename != null}" class="text-muted">No attachment</span>
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Transaction Details -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Additional Details
+                                </h6>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" th:field="*{description}"
+                                          rows="4" placeholder="Payment purpose, additional notes..."></textarea>
+                                <small class="form-text text-muted">Optional: Provide any additional details about this transaction</small>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a th:href="@{/payment/transactions/{id}(id=${transaction.id})}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-2"></i>Update Transaction
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Metadata Info -->
+            <div class="card mt-4 border-secondary">
+                <div class="card-body small">
+                    <h6 class="text-secondary mb-3">
+                        <i class="fas fa-history me-2"></i>Transaction Metadata
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Transaction Number:</strong> <span th:text="${transaction.transactionNumber}" class="badge bg-dark"></span></p>
+                            <p class="mb-1"><strong>Created:</strong> <span th:text="${transaction.createdAt != null ? #temporals.format(transaction.createdAt, 'MMM dd, yyyy HH:mm') : '-'}" class="text-muted"></span></p>
+                            <p class="mb-0"><strong>Last Updated:</strong> <span th:text="${transaction.updatedAt != null ? #temporals.format(transaction.updatedAt, 'MMM dd, yyyy HH:mm') : '-'}" class="text-muted"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1" th:if="${transaction.verifiedBy != null}"><strong>Verified By:</strong> <span th:text="${transaction.verifiedBy}" class="text-muted"></span></p>
+                            <p class="mb-1" th:if="${transaction.verifiedAt != null}"><strong>Verified At:</strong> <span th:text="${#temporals.format(transaction.verifiedAt, 'MMM dd, yyyy HH:mm')}" class="text-muted"></span></p>
+                            <p class="mb-0" th:if="${transaction.lastModifiedBy != null}"><strong>Last Modified By:</strong> <span th:text="${transaction.lastModifiedBy}" class="text-muted"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

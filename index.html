@@ -1,214 +1,244 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/support-staff-base :: layout(~{::title}, ~{::div.dashboard-content})}">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Support Staff Dashboard</title>
+    <title>EduFix Student Help Desk</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .card {
-            transition: transform 0.2s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
         }
-        .card:hover {
+        .login-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .login-options {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .login-options a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s;
+        }
+        .login-options a:hover {
+            background-color: #f1f1f1;
+        }
+        .feature-card {
+            transition: transform 0.3s;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .feature-card:hover {
             transform: translateY(-5px);
         }
-        .dashboard-content {
-            padding: 20px;
+        .register-dropdown {
+            position: relative;
+            display: inline-block;
         }
-        .stat-card {
-            border-radius: 10px;
+        .register-options {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .register-options a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s;
+        }
+        .register-options a:hover {
+            background-color: #f1f1f1;
         }
     </style>
 </head>
 <body>
-<div class="dashboard-content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="fas fa-tachometer-alt me-2"></i>Support Staff Dashboard</h1>
-        <div class="text-end">
-            <p class="mb-1">Welcome, <strong th:text="${username}">User</strong></p>
-            <small class="text-muted" th:text="${role}">Role</small>
-        </div>
-    </div>
-
-    <!-- Quick Stats -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card bg-primary text-white stat-card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4>0</h4>
-                            <p class="mb-0">Open Tickets</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-ticket-alt fa-2x"></i>
-                        </div>
-                    </div>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-graduation-cap me-2"></i>
+            EduFix Student Help Desk
+        </a>
+        <div class="navbar-nav ms-auto">
+            <div class="login-dropdown">
+                <button class="btn btn-outline-light" onclick="toggleLoginOptions()">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </button>
+                <div class="login-options" id="loginOptions">
+                    <a href="/login">
+                        <i class="fas fa-user-graduate me-2"></i>Student Portal
+                    </a>
+                    <a href="/login">
+                        <i class="fas fa-user-shield me-2"></i>Admin Portal
+                    </a>
+                    <a href="/login">
+                        <i class="fas fa-headset me-2"></i>Staff Portal
+                    </a>
+                    <a href="/payment/login">
+                        <i class="fas fa-money-bill-wave me-2"></i>Payment Portal
+                    </a>
+                    <a href="/support/login">
+                        <i class="fas fa-chalkboard-teacher me-2"></i>Lecturer Portal
+                    </a>
+                    <a href="/auth/login">
+                        <i class="fas fa-users me-2"></i>Admin (UM) Portal
+                    </a>
+                    <a href="/business-admin/login">
+                        <i class="fas fa-user-tie me-2"></i>Business Admin Portal
+                    </a>
+                    <a href="/support-staff/login">
+                        <i class="fas fa-reply me-2"></i>Admin (RM) Portal
+                    </a>
                 </div>
             </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card bg-success text-white stat-card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 th:text="${responseCount}">0</h4>
-                            <p class="mb-0">My Responses</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-reply fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card bg-warning text-white stat-card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4>0</h4>
-                            <p class="mb-0">Assigned Tickets</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-user-check fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card bg-info text-white stat-card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4>0</h4>
-                            <p class="mb-0">Resolved Today</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-check-circle fa-2x"></i>
-                        </div>
-                    </div>
+            <div class="register-dropdown ms-2">
+                <button class="btn btn-outline-success" onclick="toggleRegisterOptions()">
+                    <i class="fas fa-user-plus me-2"></i>Register
+                </button>
+                <div class="register-options" id="registerOptions">
+                    <a href="/register">
+                        <i class="fas fa-user-graduate me-2"></i>As a Student
+                    </a>
                 </div>
             </div>
         </div>
     </div>
+</nav>
 
-    <!-- Quick Actions -->
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-rocket me-2"></i>Quick Actions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <a th:href="@{/responses}" class="btn btn-outline-primary w-100 text-start">
-                                <i class="fas fa-reply me-2"></i>Response Templates
-                            </a>
-                        </div>
-                        <div class="col-md-6">
-                            <a th:href="@{/responses/create}" class="btn btn-outline-success w-100 text-start">
-                                <i class="fas fa-plus me-2"></i>Create Response
-                            </a>
-                        </div>
-                        <div class="col-md-6">
-                            <a th:href="@{/responses/my}" class="btn btn-outline-info w-100 text-start">
-                                <i class="fas fa-bookmark me-2"></i>My Responses
-                            </a>
-                        </div>
-                        <div class="col-md-6">
-                            <a th:href="@{/support-staff/tickets}" class="btn btn-outline-warning w-100 text-start">
-                                <i class="fas fa-ticket-alt me-2"></i>View Tickets
-                            </a>
-                        </div>
+<!-- Hero Section -->
+<section class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">Welcome to EduFix Student Help Desk</h1>
+        <p class="lead mb-4">Your one-stop solution for all student support services and issue resolution</p>
+        <a href="/register" class="btn btn-light btn-lg">
+            <i class="fas fa-rocket me-2"></i>Get Started
+        </a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="fw-bold">Our Features</h2>
+                <p class="text-muted">Comprehensive solutions for student support management</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-tachometer-alt fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Dashboard Analytics</h5>
+                        <p class="card-text">Real-time insights and statistics about ticket management and resolution metrics.</p>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Recent Activity</h5>
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-ticket-alt fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">Ticket Management</h5>
+                        <p class="card-text">Efficient tracking and management of student support tickets from creation to resolution.</p>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="fas fa-reply text-success me-2"></i>
-                                <span>Created new response template</span>
-                            </div>
-                            <small class="text-muted">2 hours ago</small>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="fas fa-ticket-alt text-primary me-2"></i>
-                                <span>Resolved ticket #1234</span>
-                            </div>
-                            <small class="text-muted">5 hours ago</small>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="fas fa-user-check text-info me-2"></i>
-                                <span>Assigned to new ticket</span>
-                            </div>
-                            <small class="text-muted">1 day ago</small>
-                        </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-chart-bar fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Advanced Reporting</h5>
+                        <p class="card-text">Generate comprehensive reports with multiple export options for data analysis.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-users fa-3x text-info mb-3"></i>
+                        <h5 class="card-title">User Management</h5>
+                        <p class="card-text">Comprehensive user management system with role-based access control.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-cogs fa-3x text-danger mb-3"></i>
+                        <h5 class="card-title">System Administration</h5>
+                        <p class="card-text">Complete system administration tools for managing categories, staff, and settings.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center p-4">
+                        <i class="fas fa-shield-alt fa-3x text-secondary mb-3"></i>
+                        <h5 class="card-title">Security & Access Control</h5>
+                        <p class="card-text">Robust security features with role-based permissions and authentication.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- Response Management Info -->
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-reply me-2"></i>Response Management</h5>
-                </div>
-                <div class="card-body">
-                    <p>Use response templates to quickly reply to common student inquiries and improve response time.</p>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <h6><i class="fas fa-lightbulb text-warning me-2"></i>Benefits:</h6>
-                            <ul>
-                                <li>Faster response times</li>
-                                <li>Consistent communication</li>
-                                <li>Reduced typing effort</li>
-                                <li>Professional templates</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-4">
-                            <h6><i class="fas fa-cogs text-info me-2"></i>Features:</h6>
-                            <ul>
-                                <li>Personal response library</li>
-                                <li>Admin shared templates</li>
-                                <li>Quick search and filter</li>
-                                <li>Easy template management</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-4">
-                            <h6><i class="fas fa-rocket text-success me-2"></i>Get Started:</h6>
-                            <ul>
-                                <li>Create your first template</li>
-                                <li>Browse admin templates</li>
-                                <li>Use in ticket replies</li>
-                                <li>Manage your library</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!-- Footer -->
+<footer class="bg-dark text-white py-4">
+    <div class="container text-center">
+        <p>&copy; 2024 EduFix Student Help Desk. All rights reserved.</p>
     </div>
-</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleLoginOptions() {
+        const options = document.getElementById('loginOptions');
+        const registerOptions = document.getElementById('registerOptions');
+        options.style.display = options.style.display === 'block' ? 'none' : 'block';
+        registerOptions.style.display = 'none'; // Close register dropdown
+    }
+
+    function toggleRegisterOptions() {
+        const options = document.getElementById('registerOptions');
+        const loginOptions = document.getElementById('loginOptions');
+        options.style.display = options.style.display === 'block' ? 'none' : 'block';
+        loginOptions.style.display = 'none'; // Close login dropdown
+    }
+
+    // Close dropdowns when clicking outside
+    window.onclick = function(event) {
+        if (!event.target.matches('.btn')) {
+            const loginDropdowns = document.getElementsByClassName("login-options");
+            for (let i = 0; i < loginDropdowns.length; i++) {
+                loginDropdowns[i].style.display = "none";
+            }
+            const registerDropdowns = document.getElementsByClassName("register-options");
+            for (let i = 0; i < registerDropdowns.length; i++) {
+                registerDropdowns[i].style.display = "none";
+            }
+        }
+    }
+</script>
 </body>
 </html>
