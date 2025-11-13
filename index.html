@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/support-staff-base :: layout(~{::title}, ~{::div.dashboard-content})}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Staff Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .card {
+            transition: transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .dashboard-content {
+            padding: 20px;
+        }
+        .stat-card {
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-tachometer-alt me-2"></i>Support Staff Dashboard</h1>
+        <div class="text-end">
+            <p class="mb-1">Welcome, <strong th:text="${username}">User</strong></p>
+            <small class="text-muted" th:text="${role}">Role</small>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>0</h4>
+                            <p class="mb-0">Open Tickets</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-ticket-alt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 th:text="${responseCount}">0</h4>
+                            <p class="mb-0">My Responses</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-reply fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-white stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>0</h4>
+                            <p class="mb-0">Assigned Tickets</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-user-check fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white stat-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>0</h4>
+                            <p class="mb-0">Resolved Today</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-rocket me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a th:href="@{/responses}" class="btn btn-outline-primary w-100 text-start">
+                                <i class="fas fa-reply me-2"></i>Response Templates
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a th:href="@{/responses/create}" class="btn btn-outline-success w-100 text-start">
+                                <i class="fas fa-plus me-2"></i>Create Response
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a th:href="@{/responses/my}" class="btn btn-outline-info w-100 text-start">
+                                <i class="fas fa-bookmark me-2"></i>My Responses
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a th:href="@{/support-staff/tickets}" class="btn btn-outline-warning w-100 text-start">
+                                <i class="fas fa-ticket-alt me-2"></i>View Tickets
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-reply text-success me-2"></i>
+                                <span>Created new response template</span>
+                            </div>
+                            <small class="text-muted">2 hours ago</small>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-ticket-alt text-primary me-2"></i>
+                                <span>Resolved ticket #1234</span>
+                            </div>
+                            <small class="text-muted">5 hours ago</small>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-user-check text-info me-2"></i>
+                                <span>Assigned to new ticket</span>
+                            </div>
+                            <small class="text-muted">1 day ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Response Management Info -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-reply me-2"></i>Response Management</h5>
+                </div>
+                <div class="card-body">
+                    <p>Use response templates to quickly reply to common student inquiries and improve response time.</p>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6><i class="fas fa-lightbulb text-warning me-2"></i>Benefits:</h6>
+                            <ul>
+                                <li>Faster response times</li>
+                                <li>Consistent communication</li>
+                                <li>Reduced typing effort</li>
+                                <li>Professional templates</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h6><i class="fas fa-cogs text-info me-2"></i>Features:</h6>
+                            <ul>
+                                <li>Personal response library</li>
+                                <li>Admin shared templates</li>
+                                <li>Quick search and filter</li>
+                                <li>Easy template management</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h6><i class="fas fa-rocket text-success me-2"></i>Get Started:</h6>
+                            <ul>
+                                <li>Create your first template</li>
+                                <li>Browse admin templates</li>
+                                <li>Use in ticket replies</li>
+                                <li>Manage your library</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

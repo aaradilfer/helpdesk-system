@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+      layout:decorate="~{layout}">
+<head>
+    <title>Categories - Help Desk System</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">
+                <i class="fas fa-tags me-2"></i>Categories
+            </h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <a href="/admin/categories/new" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>New Category
+                </a>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" action="/admin/categories">
+                    <div class="row g-3">
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" name="search" 
+                                   th:value="${search}" placeholder="Search categories...">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Categories Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>Categories List
+                    <span class="badge bg-primary ms-2" th:text="${categories.totalElements}">0</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${categories.empty}" class="text-center py-5">
+                    <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No categories found</h5>
+                    <p class="text-muted">Create your first category to organize tickets.</p>
+                    <a href="/admin/categories/new" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Create Category
+                    </a>
+                </div>
+                
+                <div th:if="${!categories.empty}">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="category : ${categories.content}">
+                                    <td>
+                                        <span class="fw-bold" th:text="${category.id}">#1</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold" th:text="${category.name}">Category Name</span>
+                                    </td>
+                                    <td>
+                                        <span th:text="${#strings.abbreviate(category.description, 60)}">Description</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" 
+                                              th:classappend="${category.isActive} ? 'bg-success' : 'bg-secondary'"
+                                              th:text="${category.isActive} ? 'Active' : 'Inactive'">
+                                            Active
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span th:text="${#temporals.format(category.createdAt, 'MMM dd, yyyy')}">Date</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a th:href="@{/admin/categories/{id}/edit(id=${category.id})}" 
+                                               class="btn btn-outline-primary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form th:action="@{/admin/categories/{id}/toggle-status(id=${category.id})}" 
+                                                  method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-warning" 
+                                                        th:title="${category.isActive} ? 'Deactivate' : 'Activate'">
+                                                    <i class="fas" th:classappend="${category.isActive} ? 'fa-ban' : 'fa-check'"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav th:if="${categories.totalPages > 1}">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${categories.first} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/categories(page=${currentPage - 1}, search=${search})}">
+                                    Previous
+                                </a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, categories.totalPages - 1)}"
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link" th:href="@{/admin/categories(page=${i}, search=${search})}"
+                                   th:text="${i + 1}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${categories.last} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/categories(page=${currentPage + 1}, search=${search})}">
+                                    Next
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

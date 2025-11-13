@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+      layout:decorate="~{layout}">
+<head>
+    <title>Users - Help Desk System</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">
+                <i class="fas fa-users me-2"></i>Users Management
+            </h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <a href="/admin/users/new-staff" class="btn btn-primary">
+                    <i class="fas fa-user-plus me-2"></i>Add Staff
+                </a>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" action="/admin/users">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="search" class="form-label">Search</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   th:value="${search}" placeholder="Search by name, username, or email...">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="role" class="form-label">Role</label>
+                            <select class="form-select" id="role" name="role">
+                                <option value="">All Roles</option>
+                                <option th:each="r : ${roles}" th:value="${r}" 
+                                        th:text="${r}" th:selected="${r.toString() == role}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>Filter
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>Users List
+                    <span class="badge bg-primary ms-2" th:text="${users.totalElements}">0</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${users.empty}" class="text-center py-5">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No users found</h5>
+                    <p class="text-muted">No users match your search criteria.</p>
+                </div>
+                
+                <div th:if="${!users.empty}">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="user : ${users.content}">
+                                    <td>
+                                        <span class="fw-bold" th:text="${user.id}">#1</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle me-2">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <span class="fw-bold" th:text="${user.fullName}">Full Name</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span th:text="${user.username}">username</span>
+                                    </td>
+                                    <td>
+                                        <span th:text="${user.email}">email@example.com</span>
+                                    </td>
+                                    <td>
+                                        <span th:text="${user.phoneNumber != null ? user.phoneNumber : '-'}">Phone</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge"
+                                              th:classappend="${user.role.name() == 'ADMIN'} ? 'bg-danger' :
+                                                             (${user.role.name() == 'STAFF'} ? 'bg-info' : 'bg-primary')"
+                                              th:text="${user.role}">
+                                            Role
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" 
+                                              th:classappend="${user.enabled} ? 'bg-success' : 'bg-secondary'"
+                                              th:text="${user.enabled} ? 'Active' : 'Inactive'">
+                                            Active
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span th:text="${#temporals.format(user.createdAt, 'MMM dd, yyyy')}">Date</span>
+                                    </td>
+                                    <td>
+                                        <form th:action="@{/admin/users/{id}/toggle-status(id=${user.id})}"
+                                              method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-warning btn-sm"
+                                                    th:title="${user.enabled} ? 'Deactivate' : 'Activate'"
+                                                    th:disabled="${user.role.name() == 'ADMIN'}">
+                                                <i class="fas" th:classappend="${user.enabled} ? 'fa-ban' : 'fa-check'"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav th:if="${users.totalPages > 1}">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:classappend="${users.first} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/users(page=${currentPage - 1}, search=${search}, role=${role})}">
+                                    Previous
+                                </a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, users.totalPages - 1)}"
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link" th:href="@{/admin/users(page=${i}, search=${search}, role=${role})}"
+                                   th:text="${i + 1}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${users.last} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/users(page=${currentPage + 1}, search=${search}, role=${role})}">
+                                    Next
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div layout:fragment="scripts">
+        <style>
+            .avatar-circle {
+                width: 35px;
+                height: 35px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+            }
+        </style>
+    </div>
+</body>
+</html>
+

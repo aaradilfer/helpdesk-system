@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+      layout:decorate="~{layout}">
+<head>
+    <title>Edit Ticket - Help Desk System</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">
+                <i class="fas fa-edit me-2"></i>Edit Ticket #<span th:text="${ticket.id}">001</span>
+            </h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <a th:href="@{/tickets/{id}(id=${ticket.id})}" class="btn btn-outline-secondary me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Ticket
+                </a>
+                <a href="/admin/tickets" class="btn btn-outline-secondary">
+                    <i class="fas fa-list me-2"></i>All Tickets
+                </a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <!-- Alert Messages -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}">Error message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}">Success message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-ticket-alt me-2"></i>Ticket Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Admin Note:</strong> As an administrator, you can edit all ticket fields including status. Changes will be tracked and visible to the ticket owner.
+                        </div>
+
+                        <form th:action="@{/admin/tickets/{id}/edit(id=${ticket.id})}" method="post" th:object="${ticket}">
+                            <div class="row">
+                                <div class="col-md-8 mb-3">
+                                    <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="title" th:field="*{title}" 
+                                           th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''"
+                                           placeholder="Brief description of the issue" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="priority" class="form-label">Priority <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="priority" th:field="*{priority}" 
+                                            th:classappend="${#fields.hasErrors('priority')} ? 'is-invalid' : ''"
+                                            required>
+                                        <option value="">Select Priority</option>
+                                        <option th:each="p : ${priorities}" th:value="${p}" th:text="${p}">Priority</option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="categoryId" class="form-label">Category <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="categoryId" name="categoryId" required>
+                                        <option value="">Select Category</option>
+                                        <option th:each="cat : ${categories}" 
+                                                th:value="${cat.id}" 
+                                                th:text="${cat.name}"
+                                                th:selected="${ticket.category != null && cat.id == ticket.category.id}">Category</option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="status" th:field="*{status}" 
+                                            th:classappend="${#fields.hasErrors('status')} ? 'is-invalid' : ''"
+                                            required>
+                                        <option value="">Select Status</option>
+                                        <option th:each="s : ${statuses}" 
+                                                th:value="${s}" 
+                                                th:text="${#strings.replace(s, '_', ' ')}">Status</option>
+                                    </select>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label for="urgencyLevel" class="form-label">Urgency Level</label>
+                                    <select class="form-select" id="urgencyLevel" th:field="*{urgencyLevel}">
+                                        <option value="">Select Urgency</option>
+                                        <option value="Low">Low - Can wait</option>
+                                        <option value="Normal">Normal - Standard response</option>
+                                        <option value="High">High - Need quick response</option>
+                                        <option value="Critical">Critical - Urgent attention needed</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="description" th:field="*{description}" 
+                                          th:classappend="${#fields.hasErrors('description')} ? 'is-invalid' : ''"
+                                          rows="6" 
+                                          placeholder="Detailed information about the issue..." required></textarea>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                                <div class="form-text">Minimum 10 characters, maximum 2000 characters</div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="contactEmail" class="form-label">Contact Email</label>
+                                    <input type="email" class="form-control" id="contactEmail" th:field="*{contactEmail}" 
+                                           placeholder="Alternative email for contact">
+                                    <div class="form-text">Optional: Alternative contact email</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="contactPhone" class="form-label">Contact Phone</label>
+                                    <input type="tel" class="form-control" id="contactPhone" th:field="*{contactPhone}" 
+                                           placeholder="Contact phone number">
+                                    <div class="form-text">Optional: For urgent matters</div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Important:</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>All changes will be logged and visible to the ticket owner</li>
+                                    <li>Changing the status may trigger notifications to the student</li>
+                                    <li>Ensure all information is accurate before saving</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTicketModal">
+                                    <i class="fas fa-trash me-2"></i>Delete Ticket
+                                </button>
+                                <div class="d-flex gap-2">
+                                    <a th:href="@{/tickets/{id}(id=${ticket.id})}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Update Ticket
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Ticket Metadata -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Ticket Metadata
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Ticket ID:</strong> #<span th:text="${ticket.id}">001</span></p>
+                                <p><strong>Created By:</strong> <span th:text="${ticket.user != null ? ticket.user.fullName : 'N/A'}">Student Name</span></p>
+                                <p><strong>Student Email:</strong> <span th:text="${ticket.user != null ? ticket.user.email : 'N/A'}">email@example.com</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Created:</strong> 
+                                    <span th:text="${#temporals.format(ticket.createdAt, 'MMM dd, yyyy HH:mm')}">Date</span>
+                                </p>
+                                <p><strong>Last Updated:</strong> 
+                                    <span th:text="${#temporals.format(ticket.updatedAt, 'MMM dd, yyyy HH:mm')}">Date</span>
+                                </p>
+                                <p th:if="${ticket.assignedTo != null}"><strong>Assigned To:</strong> 
+                                    <span th:text="${ticket.assignedTo.fullName}">Staff Name</span>
+                                </p>
+                                <p th:if="${ticket.assignedTo == null}"><strong>Assigned To:</strong> 
+                                    <span class="text-muted">Not assigned</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteTicketModal" tabindex="-1" aria-labelledby="deleteTicketModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteTicketModalLabel">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Delete Ticket #<span th:text="${ticket.id}">001</span>
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form th:action="@{/admin/tickets/{id}/delete(id=${ticket.id})}" method="post">
+                        <div class="modal-body">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <strong>Warning!</strong> This action cannot be undone.
+                            </div>
+                            <p>Are you sure you want to <strong class="text-danger">permanently delete</strong> this ticket?</p>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title fw-bold" th:text="${ticket.title}">Ticket Title</h6>
+                                    <p class="card-text small text-muted mb-1">
+                                        <strong>Student:</strong> <span th:text="${ticket.user != null ? ticket.user.fullName : 'N/A'}">Student Name</span>
+                                    </p>
+                                    <p class="card-text small text-muted mb-1">
+                                        <strong>Category:</strong> <span th:text="${ticket.category != null ? ticket.category.name : 'N/A'}">Category</span>
+                                    </p>
+                                    <p class="card-text small text-muted mb-1">
+                                        <strong>Status:</strong> <span th:text="${ticket.status}">Status</span>
+                                    </p>
+                                    <p class="card-text small text-muted mb-0">
+                                        <strong>Created:</strong> <span th:text="${#temporals.format(ticket.createdAt, 'MMM dd, yyyy HH:mm')}">Date</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <p class="text-danger mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                All associated data including replies and history will be permanently deleted.
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Delete Permanently
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

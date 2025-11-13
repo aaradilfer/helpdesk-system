@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+      layout:decorate="~{layout}">
+<head>
+    <title>Admin Dashboard - Help Desk System</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">
+                <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+            </h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <a href="/admin/users/new-staff" class="btn btn-primary me-2">
+                    <i class="fas fa-user-plus me-2"></i>Add Staff
+                </a>
+                <a href="/admin/categories/new" class="btn btn-outline-primary">
+                    <i class="fas fa-plus me-2"></i>New Category
+                </a>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 class="card-title" th:text="${totalTickets}">0</h4>
+                                <p class="card-text">Total Tickets</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-ticket-alt fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 class="card-title" th:text="${openTickets}">0</h4>
+                                <p class="card-text">Open Tickets</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-folder-open fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 class="card-title" th:text="${inProgressTickets}">0</h4>
+                                <p class="card-text">In Progress</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-spinner fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 class="card-title" th:text="${resolvedTickets}">0</h4>
+                                <p class="card-text">Resolved</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-check-circle fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>Tickets by Category
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${ticketsByCategory.empty}" class="text-center text-muted">
+                            No data available
+                        </div>
+                        <div th:if="${!ticketsByCategory.empty}">
+                            <div th:each="item : ${ticketsByCategory}" class="d-flex justify-content-between align-items-center mb-2">
+                                <span th:text="${item[0]}">Category Name</span>
+                                <span class="badge bg-primary" th:text="${item[1]}">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users me-2"></i>Top 5 Students by Tickets
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${topStudents.empty}" class="text-center text-muted">
+                            No data available
+                        </div>
+                        <div th:if="${!topStudents.empty}">
+                            <div th:each="item : ${topStudents}" class="d-flex justify-content-between align-items-center mb-2">
+                                <span th:text="${item[0]}">Student Name</span>
+                                <span class="badge bg-info" th:text="${item[2]}">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Tickets -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock me-2"></i>Recent Tickets
+                        </h5>
+                        <a href="/admin/tickets" class="btn btn-outline-primary btn-sm">
+                            View All Tickets
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${recentTickets.empty}" class="text-center py-4">
+                            <i class="fas fa-ticket-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No tickets found</h5>
+                            <p class="text-muted">No tickets have been submitted yet.</p>
+                        </div>
+                        
+                        <div th:if="${!recentTickets.empty}" class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Student</th>
+                                        <th>Category</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="ticket : ${recentTickets.content}">
+                                        <td th:text="${ticket.id}">#001</td>
+                                        <td>
+                                            <a th:href="@{/tickets/{id}(id=${ticket.id})}" 
+                                               class="text-decoration-none fw-bold" 
+                                               th:text="${ticket.title}">
+                                                Ticket Title
+                                            </a>
+                                        </td>
+                                        <td th:text="${ticket.user != null ? ticket.user.fullName : 'N/A'}">Student Name</td>
+                                        <td>
+                                            <span class="badge bg-secondary" th:text="${ticket.category != null ? ticket.category.name : 'N/A'}">
+                                                Category
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge" 
+                                                  th:classappend="'priority-' + ${#strings.toLowerCase(ticket.priority)}"
+                                                  th:text="${ticket.priority}">
+                                                Priority
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge" 
+                                                  th:classappend="'status-' + ${#strings.toLowerCase(#strings.replace(ticket.status, '_', '_'))}"
+                                                  th:text="${#strings.replace(ticket.status, '_', ' ')}">
+                                                Status
+                                            </span>
+                                        </td>
+                                        <td th:text="${#temporals.format(ticket.createdAt, 'MMM dd, yyyy')}">
+                                            Jan 01, 2024
+                                        </td>
+                                        <td>
+                                            <a th:href="@{/tickets/{id}(id=${ticket.id})}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

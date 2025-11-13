@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal" created-in="IU-243.25659.39">
+    <data-source name="@localhost" uuid="a108c7cd-7737-4b17-a60c-1802ff113b70">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="MYSQL" />
+      <secret-storage>master_key</secret-storage>
+      <user-name>root</user-name>
+      <schema-mapping />
+      <load-sources>user_and_system_sources</load-sources>
+    </data-source>
+    <data-source name="student_based_help_desk_001@localhost" uuid="bef08aa0-cee6-4b6e-ba6e-9c70b586f881">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="MYSQL" />
+      <user-name>User</user-name>
+      <schema-mapping />
+    </data-source>
+  </component>
+</project>

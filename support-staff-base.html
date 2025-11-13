@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout (title, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:replace="${title}">Support Staff - Response Management</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #343a40;
+        }
+        .sidebar .nav-link {
+            color: #adb5bd;
+        }
+        .sidebar .nav-link:hover {
+            color: #fff;
+        }
+        .sidebar .nav-link.active {
+            color: #fff;
+            background-color: #495057;
+        }
+        .main-content {
+            margin-left: 0;
+        }
+        @media (min-width: 768px) {
+            .main-content {
+                margin-left: 250px;
+            }
+        }
+        .status-badge {
+            font-size: 0.75rem;
+        }
+        .priority-badge {
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar position-fixed d-none d-md-block" style="width: 250px; z-index: 1000;">
+        <div class="p-3">
+            <h4 class="text-white mb-4">
+                <i class="fas fa-headset me-2"></i>Response Management
+            </h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/support-staff/dashboard-staff">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/responses">
+                        <i class="fas fa-reply me-2"></i>Response Templates
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/responses/my">
+                        <i class="fas fa-bookmark me-2"></i>My Responses
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/responses/create">
+                        <i class="fas fa-plus me-2"></i>Create Response
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/support-staff/tickets">
+                        <i class="fas fa-ticket-alt me-2"></i>Tickets
+                    </a>
+                </li>
+                <li class="nav-item mt-3">
+                    <a class="nav-link text-danger" href="/support-staff/logout">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Mobile Navigation -->
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark d-md-none">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="fas fa-headset me-2"></i>Response Management
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mobileNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/support-staff/dashboard-staff">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/responses">Response Templates</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/responses/my">My Responses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/responses/create">Create Response</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/support-staff/tickets">Tickets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="/support-staff/logout">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container-fluid p-4">
+            <!-- Flash Messages -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <!-- Page Content -->
+            <div th:replace="${content}"></div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+        
+        // Status badge colors
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'OPEN': return 'bg-primary';
+                case 'IN_PROGRESS': return 'bg-warning';
+                case 'RESOLVED': return 'bg-success';
+                case 'CLOSED': return 'bg-secondary';
+                default: return 'bg-secondary';
+            }
+        }
+        
+        // Priority badge colors
+        function getPriorityBadgeClass(priority) {
+            switch(priority) {
+                case 'LOW': return 'bg-info';
+                case 'MEDIUM': return 'bg-warning';
+                case 'HIGH': return 'bg-danger';
+                case 'URGENT': return 'bg-dark';
+                default: return 'bg-secondary';
+            }
+        }
+    </script>
+</body>
+</html>
