@@ -1,0 +1,232 @@
+================================================================================
+        STRATEGY PATTERN DEMONSTRATION GUIDE
+        Payment Portal - Student Help Desk System
+================================================================================
+
+📋 OVERVIEW
+--------------------------------------------------------------------------------
+This guide demonstrates how the Strategy Pattern is implemented in the Payment
+Portal for flexible payment verification and category validation.
+
+🎯 STRATEGY PATTERN IMPLEMENTATION
+--------------------------------------------------------------------------------
+
+1. PAYMENT VERIFICATION STRATEGIES
+   --------------------------------
+   Location: src/main/java/com/helpdesk/strategy/
+
+   A. Manual Payment Strategy (ManualPaymentStrategy.java)
+      - Requires staff approval for all payments
+      - Accepts any valid amount (> Rs. 0)
+      - Used when: payment.strategy.type=manual
+      - Console Output: Shows "MANUAL PAYMENT STRATEGY" with detailed logs
+
+   B. Automated Payment Strategy (AutomatedPaymentStrategy.java)
+      - Auto-approves payments above Rs. 500
+      - Requires manual review for payments below Rs. 500
+      - Used when: payment.strategy.type=automated
+      - Console Output: Shows "AUTOMATED PAYMENT STRATEGY" with threshold checks
+
+2. CATEGORY VALIDATION STRATEGIES
+   --------------------------------
+   Location: src/main/java/com/helpdesk/strategy/
+
+   A. Strict Category Strategy (StrictCategoryStrategy.java)
+      - Does NOT allow duplicate category names
+      - Enforces maximum length (50 characters)
+      - Used when: category.strategy.type=strict
+      - Console Output: Shows "STRICT CATEGORY STRATEGY" with validation results
+
+   B. Lenient Category Strategy (LenientCategoryStrategy.java)
+      - Allows duplicate category names with warnings
+      - More flexible validation rules
+      - Used when: category.strategy.type=lenient
+      - Console Output: Shows "LENIENT CATEGORY STRATEGY" with warnings
+
+📊 HOW TO DEMONSTRATE FOR YOUR LECTURER
+--------------------------------------------------------------------------------
+
+STEP 1: Check Current Strategy Configuration
+   ├─ Open: src/main/resources/application.properties
+   ├─ Check: payment.strategy.type (manual or automated)
+   └─ Check: category.strategy.type (strict or lenient)
+
+STEP 2: Start Application and Watch Console
+   ├─ Run: mvn spring-boot:run
+   ├─ Look for:
+   │    ✓ Payment Strategy: MANUAL (Requires staff verification)
+   │    ✓ Category Strategy: STRICT (No duplicate categories)
+   └─ These appear when application starts
+
+STEP 3: Create a New Payment Transaction
+   ├─ Login: http://localhost:8080/ → Payment Portal
+   ├─ Credentials: payment1 / payment123
+   ├─ Click: "Payment Transactions" → "Create Transaction"
+   ├─ Fill Form:
+   │    Student Name: Test Student
+   │    Student ID: STU999
+   │    Email: test@university.edu
+   │    Amount: 1000  (or 300 to test threshold)
+   │    Category: Select any
+   │    Payment Method: BANK_TRANSFER
+   ├─ Click: "Create Transaction"
+   └─ Watch IntelliJ Console for:
+
+      ════════════════════════════════════════════════════════════════════════════════
+      🎯 STRATEGY PATTERN DEMONSTRATION - CREATING PAYMENT TRANSACTION
+      ════════════════════════════════════════════════════════════════════════════════
+      📋 Transaction Number: TXN-2025-XXXX
+      👤 Student: Test Student (STU999)
+      💰 Amount: Rs. 1000
+      📁 Category: Tuition Fee
+
+      ────────────────────────────────────────────────────────────────────────────────
+      🔍 STRATEGY #1: CATEGORY VALIDATION
+      ────────────────────────────────────────────────────────────────────────────────
+      ✓ Active Strategy: Strict
+      ✓ Validation Result: PASSED ✅
+
+      ────────────────────────────────────────────────────────────────────────────────
+      🔍 STRATEGY #2: PAYMENT VERIFICATION
+      ────────────────────────────────────────────────────────────────────────────────
+      ✓ Active Strategy: Manual
+      ℹ️  Payment verification will be applied when verify() is called
+      ℹ️  Current Status: PENDING
+
+      ════════════════════════════════════════════════════════════════════════════════
+      ✅ TRANSACTION CREATED SUCCESSFULLY
+      📝 Transaction ID: XX
+      📋 Transaction Number: TXN-2025-XXXX
+      📊 Status: PENDING
+      ════════════════════════════════════════════════════════════════════════════════
+
+STEP 4: Verify a Transaction
+   ├─ Click on the created transaction
+   ├─ Click: "Verify Payment" button
+   ├─ Confirm verification
+   └─ Watch IntelliJ Console for:
+
+      ════════════════════════════════════════════════════════════════════════════════
+      🎯 STRATEGY PATTERN DEMONSTRATION - VERIFYING PAYMENT
+      ════════════════════════════════════════════════════════════════════════════════
+      📋 Transaction: TXN-2025-XXXX
+      💰 Amount: Rs. 1000
+      👤 Student: Test Student
+      📁 Category: Tuition Fee
+
+      ────────────────────────────────────────────────────────────────────────────────
+      🔍 STRATEGY PATTERN: PAYMENT VERIFICATION
+      ────────────────────────────────────────────────────────────────────────────────
+      ✓ Active Strategy: Manual
+      ✓ Manual Verification Request: APPROVE ✅
+
+        ┌────────────────────────────────────────────────────────────────────────────┐
+        │ 📋 MANUAL PAYMENT STRATEGY - Verification Process                          │
+        ├────────────────────────────────────────────────────────────────────────────┤
+        │ Strategy Type: Manual Verification (Requires Staff Approval)               │
+        │ Amount: Rs. 1000                                                            │
+        ├────────────────────────────────────────────────────────────────────────────┤
+        │ ✅ Decision: ACCEPTED FOR MANUAL REVIEW                                     │
+        │ 📝 Note: Payment requires staff verification before final approval          │
+        └────────────────────────────────────────────────────────────────────────────┘
+
+      ✓ Strategy Recommendation: AUTO-APPROVE ✅
+      ✓ Final Decision: VERIFIED ✅
+      📊 Status Updated: PENDING → VERIFIED
+
+      ════════════════════════════════════════════════════════════════════════════════
+      ✅ VERIFICATION COMPLETED
+      📝 Verified By: payment1
+      🕒 Verified At: 2025-10-22 17:45:30
+      ════════════════════════════════════════════════════════════════════════════════
+
+STEP 5: Change Strategy and Demonstrate Difference
+   ├─ Go to: http://localhost:8080/payment/settings
+   ├─ Change: Payment Strategy from "manual" to "automated"
+   ├─ Click: "Apply Strategy changes"
+   ├─ Application will restart automatically
+   ├─ Create new transaction with Amount: 300 (below Rs. 500)
+   └─ Watch IntelliJ Console for AUTOMATED strategy with DIFFERENT behavior:
+
+        ┌────────────────────────────────────────────────────────────────────────────┐
+        │ 🤖 AUTOMATED PAYMENT STRATEGY - Verification Process                       │
+        ├────────────────────────────────────────────────────────────────────────────┤
+        │ Strategy Type: Automated Verification (No Staff Required)                  │
+        │ Amount: Rs. 300                                                             │
+        │ Minimum Threshold: Rs. 500.0                                                │
+        ├────────────────────────────────────────────────────────────────────────────┤
+        │ ⚠️  Decision: REQUIRES MANUAL REVIEW                                        │
+        │ 📝 Reason: Amount below minimum threshold (Rs. 500.0)                       │
+        │ 👤 Action: Escalate to staff for manual verification                        │
+        └────────────────────────────────────────────────────────────────────────────┘
+
+   ├─ Create another transaction with Amount: 1000 (above Rs. 500)
+   └─ Watch IntelliJ Console for AUTOMATED strategy with AUTO-APPROVAL:
+
+        ┌────────────────────────────────────────────────────────────────────────────┐
+        │ 🤖 AUTOMATED PAYMENT STRATEGY - Verification Process                       │
+        ├────────────────────────────────────────────────────────────────────────────┤
+        │ Strategy Type: Automated Verification (No Staff Required)                  │
+        │ Amount: Rs. 1000                                                            │
+        │ Minimum Threshold: Rs. 500.0                                                │
+        ├────────────────────────────────────────────────────────────────────────────┤
+        │ ✅ Decision: AUTO-APPROVED (Amount > Rs. 500.0)                             │
+        │ 📝 Note: Payment automatically verified by system                           │
+        │ 🚀 Action: No manual verification required                                  │
+        └────────────────────────────────────────────────────────────────────────────┘
+
+🎓 KEY POINTS TO EXPLAIN TO LECTURER
+--------------------------------------------------------------------------------
+
+1. STRATEGY PATTERN BENEFITS:
+   ✓ Flexibility: Switch between Manual and Automated verification at runtime
+   ✓ Open/Closed Principle: Add new strategies without modifying existing code
+   ✓ Single Responsibility: Each strategy handles its own verification logic
+   ✓ Easy Testing: Test each strategy independently
+
+2. REAL-WORLD APPLICATION:
+   ✓ Different payment gateways (PayPal, Stripe, Bank Transfer)
+   ✓ Different validation rules per client/organization
+   ✓ A/B testing of business rules
+   ✓ Compliance with different regional regulations
+
+3. DESIGN PATTERN ELEMENTS:
+   ✓ Context: PaymentTransactionService
+   ✓ Strategy Interface: PaymentStrategy, CategoryStrategy
+   ✓ Concrete Strategies: ManualPaymentStrategy, AutomatedPaymentStrategy
+   ✓ Configuration: application.properties (strategy selection)
+
+4. CONSOLE OUTPUT DEMONSTRATES:
+   ✓ Which strategy is currently active
+   ✓ What decision the strategy makes
+   ✓ Why the decision was made (business rules)
+   ✓ Clear visualization of strategy pattern in action
+
+📁 CODE LOCATIONS FOR REFERENCE
+--------------------------------------------------------------------------------
+
+Strategy Interfaces:
+  - src/main/java/com/helpdesk/strategy/PaymentStrategy.java
+  - src/main/java/com/helpdesk/strategy/CategoryStrategy.java
+
+Concrete Strategies:
+  - src/main/java/com/helpdesk/strategy/ManualPaymentStrategy.java
+  - src/main/java/com/helpdesk/strategy/AutomatedPaymentStrategy.java
+  - src/main/java/com/helpdesk/strategy/StrictCategoryStrategy.java
+  - src/main/java/com/helpdesk/strategy/LenientCategoryStrategy.java
+
+Context (Service using strategies):
+  - src/main/java/com/helpdesk/service/PaymentTransactionService.java
+
+Configuration:
+  - src/main/java/com/helpdesk/config/PaymentStrategyConfig.java
+  - src/main/resources/application.properties
+
+Controllers:
+  - src/main/java/com/helpdesk/controller/PaymentTransactionController.java
+  - src/main/java/com/helpdesk/controller/PaymentSettingsController.java
+
+================================================================================
+END OF DEMONSTRATION GUIDE
+================================================================================
+
